@@ -1,0 +1,5 @@
+/build
+/.externalNativeBuild
+.externalNativeBuild
+/.cxx
+libusbtv.iml

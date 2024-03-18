@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LPR</string>
+    <string name="str_title_permission_denied">Requested Permission(s) Denied</string>
+    <string name="str_msg_permission_denied">You have denied the required permission(s) for the application to function. Application wil now close.</string>
+    <string name="str_close">Close</string>
+    <string name="str_select_country">Select Country: </string>
+    <string name="str_country_ua">Ukraine</string>
+    <string name="video">Video:</string>
+    <string name="open">Open</string>
+    <string name="usb">USB:</string>
+    <string name="image_view">Image View</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="stop">Stop</string>
+    <string-array name="arr_country">
+        <item>@string/str_country_ua</item>
+    </string-array>
+</resources>

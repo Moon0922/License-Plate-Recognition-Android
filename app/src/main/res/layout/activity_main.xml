@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/video"/>
+
+        <EditText
+            android:id="@+id/et_video_path"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:focusable="false"/>
+
+        <Button
+            android:id="@+id/btn_video_open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open"
+            />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+
+        <RadioButton
+            android:id="@+id/rb_usb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/usb"/>
+
+        <EditText
+            android:id="@+id/et_usb_path"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusable="false"
+            android:visibility="invisible"/>
+
+        <Button
+            android:id="@+id/btn_usb_open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_select_country"/>
+
+        <Spinner
+            android:id="@+id/spin_country"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_preview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="20dp">
+
+        <SurfaceView
+            android:id="@+id/sf_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            />
+        <com.tcvdev.lpr.element.DetectView
+            android:id="@+id/vw_detect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
+
+    <SeekBar
+        android:id="@+id/sb_time"
+        android:layout_width="match_parent"
+        android:layout_height="30dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="1">
+
+        <Button
+            android:id="@+id/btn_rewind_30"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="&lt;&lt;"/>
+
+        <Button
+            android:id="@+id/btn_rewind_10"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="&lt;"/>
+
+        <TextView
+            android:id="@+id/tv_playing_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center"
+            android:textColor="@color/colorAccent"/>
+
+        <Button
+            android:id="@+id/btn_forward_10"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="&gt;"/>
+
+        <Button
+            android:id="@+id/btn_forward_30"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="&gt;&gt;"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_video_play"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/play"
+            />
+
+        <Button
+            android:id="@+id/btn_video_pause"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/pause"
+            />
+
+        <Button
+            android:id="@+id/btn_video_stop"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/stop"
+            />
+    </LinearLayout>
+</LinearLayout>
