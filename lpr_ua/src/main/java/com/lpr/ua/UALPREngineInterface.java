@@ -40,12 +40,11 @@ public class UALPREngineInterface {
 
         if (m_hEngineHandle != 0) {
 
-            int rectArray[] = new int[4];
+            int[] rectArray = new int[4];
             rectArray[0] = rect.left;
             rectArray[2] = rect.right;
             rectArray[1] = rect.top;
             rectArray[3] = rect.bottom;
-
             m_instance.RequestJob(m_hEngineHandle, frameId, matImage, rectArray, minPlateH, maxPlateH);
 
         }
@@ -61,7 +60,6 @@ public class UALPREngineInterface {
 
 
     public void SetLPRCallback(UALPREngine.UALPRCallback callback) {
-
         m_instance.setLPRCallback(callback);
     }
 }

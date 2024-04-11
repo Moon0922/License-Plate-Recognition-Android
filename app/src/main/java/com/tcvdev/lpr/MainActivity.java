@@ -6,6 +6,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.hardware.usb.UsbDevice;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -37,12 +39,16 @@ import com.arksine.libusbtv.UsbTvFrame;
 import com.codekidlabs.storagechooser.Content;
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.frank.ffmpeg.VideoPlayer;
+import com.lpr.gt.GTLPREngine;
+import com.lpr.gt.GTLPREngineInterface;
 import com.lpr.ua.UALPREngine;
+import com.lpr.ua.UALPREngineInterface;
 import com.tcvdev.lpr.common.USBTVRenderer;
 import com.tcvdev.lpr.common.Util;
 import com.tcvdev.lpr.element.DetectView;
 import com.tcvdev.lpr.model.CARPLATEDATA;
 
+import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 import java.io.IOException;
@@ -54,7 +60,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, SurfaceHolder.Callback,
-        VideoPlayer.FFMPEGCallback, USBTVRenderer.USBRenderCallback, UALPREngine.UALPRCallback {
+        VideoPlayer.FFMPEGCallback, USBTVRenderer.USBRenderCallback, UALPREngine.UALPRCallback, GTLPREngine.GTLPRCallback {
+
+    private UALPREngineInterface ualprEngineInterface = new UALPREngineInterface();
+    private GTLPREngineInterface gtlprEngineInterface = new GTLPREngineInterface();
+    private int m_nLPRType = 0; // 0: UA, 1; GT
     private static final int STATUS_STOP = 0;
     private static final int STATUS_PAUSE = 1;
     private static final int STATUS_PLAY = 2;
@@ -76,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean m_bVideoPaused = false;
     private boolean m_bUSBPaused = false;
     private long mDuration;
+    private int m_nCurFrame = 0;
     private boolean m_bFirstOpen = true;
     private byte[] byteVideoFrame;
     private byte[] byteUSBFrame;
@@ -97,14 +108,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Manifest.permission.READ_EXTERNAL_STORAGE,
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (OpenCVLoader.initLocal()) {
+            Log.i("OPENCV", "OpenCV loaded successfully");
+        } else {
+            Log.e("OPENCV", "OpenCV initialization failed!");
+            (Toast.makeText(this, "OpenCV initialization failed!", Toast.LENGTH_LONG)).show();
+            return;
+        }
+
         initUI();
         initVariable();
         m_videoPlayer = new VideoPlayer();
         m_videoPlayer.setFFMPEGCallback(this);
+
+        ualprEngineInterface.CreateEngine();
+        ualprEngineInterface.StartEngine();
+        ualprEngineInterface.SetLPRCallback(this);
+
+        gtlprEngineInterface.CreateEngine();
+        gtlprEngineInterface.StartEngine();
+        gtlprEngineInterface.SetLPRCallback(this);
     }
 
     @Override
@@ -189,7 +218,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (m_videoPlayer != null)
             m_videoPlayer.setSeekStatus(nSeekState);
     }
+    @Override
+    public void onGTLPRResult(byte[] byteArray) {
 
+        CARPLATEDATA carplatedata = new CARPLATEDATA();
+        CARPLATEDATA.parseFromByte(byteArray, carplatedata);
+
+        if (carplatedata.nPlate == 0) {
+
+            if (m_nNotFoundCnt < 10)
+            {
+                m_nNotFoundCnt++;
+                m_vwDetect.setLPRResult(m_prevCarPlateData);
+            }
+            else {
+
+                m_prevCarPlateData = null;
+                m_vwDetect.setLPRResult(m_prevCarPlateData);
+                m_nNotFoundCnt = 0;
+            }
+
+        } else {
+
+            m_nNotFoundCnt = 0;
+            m_vwDetect.setLPRResult(carplatedata);
+            m_prevCarPlateData = carplatedata;
+        }
+    }
+    @Override
+    public void onUALPRResult(byte[] byteArray) {
+
+        CARPLATEDATA carplatedata = new CARPLATEDATA();
+        CARPLATEDATA.parseFromByte(byteArray, carplatedata);
+
+        if (carplatedata.nPlate == 0) {
+
+            if (m_nNotFoundCnt < 10)
+            {
+                m_nNotFoundCnt++;
+                m_vwDetect.setLPRResult(m_prevCarPlateData);
+            }
+            else {
+
+                m_prevCarPlateData = null;
+                m_vwDetect.setLPRResult(m_prevCarPlateData);
+                m_nNotFoundCnt = 0;
+            }
+
+        } else {
+
+            m_nNotFoundCnt = 0;
+            m_vwDetect.setLPRResult(carplatedata);
+            m_prevCarPlateData = carplatedata;
+        }
+    }
     private final UsbTv.onFrameReceivedListener mOnFrameReceivedListener = new UsbTv.onFrameReceivedListener() {
         @Override
         public void onFrameReceived(UsbTvFrame frame) {
@@ -447,7 +529,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         m_spinCountry.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+                m_nLPRType = position;
             }
 
             @Override
@@ -509,6 +591,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadVideo() throws IOException {
+        m_vwDetect.setLPRResult(null);
+
         m_nNotFoundCnt = 0;
         final String strVideoPath = m_etVideoPath.getText().toString();
         try {
@@ -687,6 +771,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onGrabFrame(int cur_time, int duration) {
         setPlayingTime(cur_time, duration);
+        Mat matFrame = new Mat(m_nVideoHeight, m_nVideoWidth, CV_8UC4);
+        matFrame.put(0, 0, byteVideoFrame);
+        Rect rect = new Rect((int) (0.1f * m_nVideoWidth), (int) (0.1f * m_nVideoHeight), (int) (0.9f * m_nVideoWidth), (int) (0.9f * m_nVideoHeight));
+        switch (m_nLPRType) {
+            case 0:
+                ualprEngineInterface.Process(m_nCurFrame, matFrame.getNativeObjAddr(), rect);
+                break;
+            case 1:
+                gtlprEngineInterface.Process(m_nCurFrame, matFrame.getNativeObjAddr(), rect);
+                break;
+        }
+        matFrame.release();
+        m_nCurFrame++;
     }
 
     @Override
@@ -705,27 +802,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onUSBFrameGrab(int width, int height) {
         Mat matFrame = new Mat(height, width, CV_8UC4);
         matFrame.put(0, 0, byteUSBFrame);
-    }
-
-    @Override
-    public void onUALPRResult(byte[] byteArray) {
-        CARPLATEDATA carplatedata = new CARPLATEDATA();
-        CARPLATEDATA.parseFromByte(byteArray, carplatedata);
-
-        if (carplatedata.nPlate == 0) {
-            if (m_nNotFoundCnt < 10) {
-                m_nNotFoundCnt++;
-                m_vwDetect.setLPRResult(m_prevCarPlateData);
-            } else {
-
-                m_prevCarPlateData = null;
-                m_vwDetect.setLPRResult(m_prevCarPlateData);
-                m_nNotFoundCnt = 0;
-            }
-        } else {
-            m_nNotFoundCnt = 0;
-            m_vwDetect.setLPRResult(carplatedata);
-            m_prevCarPlateData = carplatedata;
-        }
     }
 }

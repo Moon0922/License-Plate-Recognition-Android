@@ -2,6 +2,7 @@ package com.lpr.ua;
 
 public class UALPREngine {
 
+    private long mNativeData;
     static {
         System.loadLibrary("opencv_java4");
         System.loadLibrary("lpr_ua");

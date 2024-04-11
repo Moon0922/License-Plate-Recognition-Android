@@ -19,10 +19,11 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LPR"
+rootProject.name = "License-Plate-Recognition-Android"
 include ':app'
 include ':opencv'
 include ':storagechooser'
 include ':ffmpeg'
 include ':libusbtv'
 include ':lpr_ua'
+include ':lpr_gt'

@@ -16,8 +16,6 @@ import com.tcvdev.lpr.R;
 import com.tcvdev.lpr.common.Util;
 
 public class DetectView extends View {
-
-
     private Paint mRectPaint;
     private Paint mTextNumberPaint;
     private Paint mTextConfPaint;
@@ -110,7 +108,7 @@ public class DetectView extends View {
                         canvas.drawText(strResult, rectNumberBG.left + textPadding, rectNumberBG.bottom - textPadding, mTextNumberPaint);
 
                         // Draw Conf;
-                        String strConf = String.format("Conf: %.3f%%", plateData.pfDist);
+                        String strConf = String.format("Conf: %.3f%%", plateData.fTrust);
                         Rect rectConfBound = Util.getTextBounds(mTextConfPaint, strConf);
                         RectF rectConfBG = new RectF(rectPlate.left, rectPlate.top - offset - rectConfBound.height() - textPadding * 2,
                                 rectPlate.left + rectConfBound.width() + textPadding * 2, rectPlate.top - offset);
@@ -130,7 +128,6 @@ public class DetectView extends View {
     }
 
     public void setLPRResult(CARPLATEDATA carplatedata) {
-
         this.mCarPlateData = carplatedata;
         ((Activity) mContext).runOnUiThread(new Runnable() {
             @Override

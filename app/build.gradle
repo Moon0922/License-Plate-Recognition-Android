@@ -49,4 +49,5 @@ dependencies {
     implementation project(':ffmpeg')
     implementation project(':libusbtv')
     implementation project(':lpr_ua')
+    implementation project(':lpr_gt')
 }

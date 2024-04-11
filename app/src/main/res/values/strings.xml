@@ -6,6 +6,7 @@
     <string name="str_close">Close</string>
     <string name="str_select_country">Select Country: </string>
     <string name="str_country_ua">Ukraine</string>
+    <string name="str_country_gt">Guatemala</string>
     <string name="video">Video:</string>
     <string name="open">Open</string>
     <string name="usb">USB:</string>
@@ -15,5 +16,6 @@
     <string name="stop">Stop</string>
     <string-array name="arr_country">
         <item>@string/str_country_ua</item>
+        <item>@string/str_country_gt</item>
     </string-array>
 </resources>
